@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dark Marketplace</title>
+    <script src="https://telegram.org"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #0f0f12;
+            color: #ffffff;
+            padding: 12px;
+            padding-bottom: 80px;
+        }
+        .search-bar {
+            background-color: #1c1c22;
+            border-radius: 12px;
+            padding: 10px 14px;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            border: 1px solid #2c2c35;
+        }
+        .search-bar input {
+            background: transparent;
+            border: none;
+            color: #ffffff;
+            font-size: 15px;
+            width: 100%;
+            outline: none;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        .card {
+            background-color: #18181d;
+            border-radius: 14px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #26262e;
+        }
+        .img-box {
+            position: relative;
+            width: 100%;
+            height: 150px;
+            background-color: #23232b;
+        }
+        .img-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .discount {
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            background-color: #cb11ab;
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 6px;
+        }
+        .info {
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            justify-content: space-between;
+        }
+        .prices {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+        .new-price {
+            font-size: 16px;
+            font-weight: 800;
+            color: #ffffff;
+        }
+        .old-price {
+            font-size: 12px;
+            color: #777785;
+            text-decoration: line-through;
+        }
+        .title {
+            font-size: 13px;
+            color: #d1d1db;
+            margin-bottom: 6px;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .rating {
+            font-size: 12px;
+            color: #9999a8;
+            margin-bottom: 10px;
+        }
+        .rating span {
+            color: #ffb800;
+        }
+        .btn {
+            width: 100%;
+            background: linear-gradient(90deg, #cb11ab, #8b11cb);
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            padding: 9px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn.added {
+            background: #28a745;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="Поиск товаров..." onkeyup="filterProducts()">
+    </div>
+
+    <div class="grid" id="catalog"></div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.setHeaderColor('#0f0f12');
+        tg.setBackgroundColor('#0f0f12');
+
+        // ==========================================
+        // ЗДЕСЬ ТЫ МОЖЕШЬ МЕНЯТЬ ТОВАРЫ, ЦЕНЫ И ФОТО
+        // ==========================================
+        const products = [
+            {
+                id: 1,
+                name: "Беспроводные наушники Pro",
+                price: 2490,
+                oldPrice: 4990,
+                discount: "-50%",
+                rating: "4.9 (128)",
+                image: "https://unsplash.com"
+            },
+            {
+                id: 2,
+                name: "Смарт-часы Ultra Black",
+                price: 3890,
+                oldPrice: 6500,
+                discount: "-40%",
+                rating: "4.8 (84)",
+                image: "https://unsplash.com"
+            },
+            {
+                id: 3,
+                name: "Кроссовки спортивные Dark",
+                price: 4200,
+                oldPrice: 7000,
+                discount: "-40%",
+                rating: "5.0 (42)",
+                image: "https://unsplash.com"
+            },
+            {
+                id: 4,
+                name: "Рюкзак городской водостойкий",
+                price: 1990,
+                oldPrice: 3200,
+                discount: "-38%",
+                rating: "4.7 (210)",
+                image: "https://unsplash.com"
+            }
+        ];
+
+        let cart = [];
+
+        function renderProducts(items) {
+            const catalog = document.getElementById('catalog');
+            catalog.innerHTML = '';
+
+            items.forEach(item => {
+                const isAdded = cart.some(c => c.id === item.id);
+                catalog.innerHTML += `
+                    <div class="card">
+                        <div class="img-box">
+                            <img src="${item.image}" alt="${item.name}">
+                            <div class="discount">${item.discount}</div>
+                        </div>
+                        <div class="info">
+                            <div>
+                                <div class="prices">
+                                    <span class="new-price">${item.price} ₽</span>
+                                    <span class="old-price">${item.oldPrice} ₽</span>
+                                </div>
+                                <div class="title">${item.name}</div>
+                                <div class="rating"><span>★</span> ${item.rating}</div>
+                            </div>
+                            <button class="btn ${isAdded ? 'added' : ''}" onclick="toggleCart(${item.id})">
+                                ${isAdded ? 'В корзине ✓' : 'В корзину'}
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function toggleCart(id) {
+            const product = products.find(p => p.id === id);
+            const index = cart.findIndex(c => c.id === id);
+
+            if (index > -1) {
+                cart.splice(index, 1);
+            } else {
+                cart.push(product);
+            }
+
+            renderProducts(products);
+            updateMainButton();
+        }
+
+        function updateMainButton() {
+            if (cart.length > 0) {
+                const total = cart.reduce((sum, item) => sum + item.price, 0);
+                tg.MainButton.setText(`Оформить заказ (${cart.length} шт.) — ${total} ₽`);
+                tg.MainButton.show();
+            } else {
+                tg.MainButton.hide();
+            }
+        }
+
+        function filterProducts() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = products.filter(p => p.name.toLowerCase().includes(query));
+            renderProducts(filtered);
+        }
+
+        tg.MainButton.onClick(() => {
+            if (cart.length > 0) {
+                tg.sendData(JSON.stringify(cart));
+            }
+        });
+
+        renderProducts(products);
+    </script>
+</body>
+</html>
