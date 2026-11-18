@@ -31,7 +31,7 @@
         .screen.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Каталог (Карточки) */
+        /* Каталог */
         .catalog { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 16px; }
         .product-card { background: var(--card); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; position: relative; cursor: pointer; }
         .img-container { width: 100%; aspect-ratio: 1; background: #2c2c2e; position: relative; }
@@ -75,7 +75,7 @@
         .profile-info { text-align: left; font-size: 14px; margin-bottom: 20px; line-height: 1.6; }
         .profile-info span { color: var(--muted); }
 
-        /* Модальные окна (Общие) */
+        /* Модальные окна */
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 16px; }
         .modal-overlay.active { display: flex; }
         .modal { background: var(--card); width: 100%; max-width: 400px; border-radius: 20px; padding: 20px; max-height: 90vh; overflow-y: auto; }
@@ -93,13 +93,28 @@
         .btn-save { background: var(--accent); color: white; border: none; padding: 14px; width: 100%; border-radius: 12px; font-weight: bold; font-size: 16px; margin-top: 10px; }
         .btn-close { background: transparent; color: var(--muted); border: none; width: 100%; padding: 12px; font-weight: bold; font-size: 14px; margin-top: 5px; }
 
-        /* Полноэкранный просмотр товара */
+        /* Просмотр товара */
         .full-product-img { width: 100%; height: 300px; object-fit: contain; background: #000; border-radius: 12px; margin-bottom: 12px; }
         .full-product-title { font-size: 22px; font-weight: bold; margin-bottom: 8px; }
         .full-product-price { font-size: 24px; color: var(--accent); font-weight: bold; margin-bottom: 12px; }
         .full-product-desc { font-size: 14px; color: var(--muted); line-height: 1.5; margin-bottom: 20px; }
 
         .empty-state { text-align: center; color: var(--muted); padding: 40px 0; font-size: 15px; grid-column: 1 / -1; }
+
+        /* ВЫБОР ОПЛАТЫ */
+        .payment-methods { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+        .payment-option { background: var(--bg); border: 1px solid #2c2c2e; border-radius: 12px; padding: 12px; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: 0.2s; }
+        .payment-option.active { border-color: var(--accent); background: rgba(179, 44, 182, 0.1); }
+        .payment-option input[type="radio"] { display: none; }
+        .radio-custom { width: 20px; height: 20px; border: 2px solid var(--muted); border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .payment-option.active .radio-custom { border-color: var(--accent); }
+        .radio-custom::after { content: ''; width: 10px; height: 10px; background: var(--accent); border-radius: 50%; opacity: 0; transition: 0.2s; }
+        .payment-option.active .radio-custom::after { opacity: 1; }
+        .payment-text { font-size: 15px; font-weight: 500; }
+        
+        .requisites-box { display: none; background: #2c2c2e; padding: 16px; border-radius: 12px; margin-bottom: 16px; text-align: center; }
+        .requisites-box.active { display: block; }
+        .copy-btn { background: var(--success); color: black; border: none; padding: 10px 16px; border-radius: 8px; font-weight: bold; margin-top: 12px; cursor: pointer; font-size: 14px; width: 100%; }
     </style>
 </head>
 <body>
@@ -133,19 +148,15 @@
     <div class="screen" id="screen-profile">
         <h2 style="margin-top: 16px;">Профиль</h2>
         
-        <!-- Панель Админа -->
         <div class="admin-panel" id="admin-panel" style="display: none;">
             <p style="font-size: 14px; color: var(--accent); font-weight: bold; margin-bottom: 16px;">👑 Вы вошли как Администратор</p>
             <button class="btn-add-product" id="openAddModalBtn">➕ Добавить товар</button>
             <button class="btn-copy" onclick="copyBotLink()">🔗 Ссылка на бота</button>
         </div>
 
-        <!-- Панель Покупателя -->
         <div class="user-panel" id="user-panel">
             <p style="font-size: 16px; font-weight: bold; margin-bottom: 10px;">Добро пожаловать!</p>
-            <div class="profile-info" id="user-data-display">
-                <!-- Тут будут данные покупателя -->
-            </div>
+            <div class="profile-info" id="user-data-display"></div>
             <button class="btn-add-product" id="editProfileBtn">✏️ Изменить мои данные</button>
         </div>
     </div>
@@ -192,6 +203,7 @@
     <div class="modal-overlay" id="checkoutModal">
         <div class="modal">
             <h2>Оформление заказа</h2>
+            
             <div class="input-group">
                 <label>Ваше Имя</label>
                 <input type="text" id="checkoutName" placeholder="Иван">
@@ -201,10 +213,37 @@
                 <input type="tel" id="checkoutPhone" placeholder="+7 (999) 000-00-00">
             </div>
             <div class="input-group">
-                <label>Город и адрес (или способ доставки)</label>
+                <label>Город и адрес</label>
                 <input type="text" id="checkoutAddress" placeholder="Москва, ул. Ленина 1">
             </div>
-            <button class="btn-save" onclick="submitOrder()">Отправить заказ продавцу</button>
+
+            <!-- ВЫБОР ОПЛАТЫ -->
+            <div class="input-group" style="margin-top: 20px;">
+                <label>Способ оплаты</label>
+                <div class="payment-methods">
+                    <label class="payment-option active" id="payOptCash" onclick="selectPayment('cash')">
+                        <input type="radio" name="payment" value="cash" checked>
+                        <div class="radio-custom"></div>
+                        <span class="payment-text">💵 При получении</span>
+                    </label>
+                    <label class="payment-option" id="payOptCard" onclick="selectPayment('card')">
+                        <input type="radio" name="payment" value="card">
+                        <div class="radio-custom"></div>
+                        <span class="payment-text">💳 Перевод по СБП (Т-Банк)</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- БЛОК С РЕКВИЗИТАМИ -->
+            <div class="requisites-box" id="requisitesBox">
+                <p style="font-size: 14px; margin-bottom: 8px;">Переведите сумму по СБП:</p>
+                <div style="font-size: 15px; font-weight: bold; margin-bottom: 4px;" id="bankNameDisplay"></div>
+                <div style="font-size: 14px; margin-bottom: 8px; color: var(--muted);" id="holderNameDisplay"></div>
+                <div style="font-size: 20px; font-weight: bold; letter-spacing: 1px;" id="phoneNumberDisplay"></div>
+                <button class="copy-btn" onclick="copyPhone()">📋 Скопировать номер</button>
+            </div>
+
+            <button class="btn-save" onclick="submitOrder()">Отправить заказ</button>
             <button class="btn-close" onclick="closeCheckoutModal()">Отмена</button>
         </div>
     </div>
@@ -219,7 +258,7 @@
             </div>
             <div class="input-group">
                 <label>Цена (₽)</label>
-                <input type="number" id="addPrice" placeholder="4500">
+                <input type="text" inputmode="numeric" id="addPrice" placeholder="Например: 14565">
             </div>
             <div class="input-group">
                 <label>Описание</label>
@@ -244,6 +283,11 @@
         const ADMIN_ID = 8264874574; 
         const SELLER_USERNAME = 'fhdhdjwdp'; 
         const BOT_USERNAME = 'xhunter77_store_bot'; 
+        
+        // ТВОИ РЕКВИЗИТЫ (Уже вставлены)
+        const PAYMENT_PHONE = '+7 989 900-11-27'; // Номер для СБП
+        const CARD_HOLDER = 'Заур А.'; 
+        const BANK_NAME = 'Т-Банк'; 
         // ==========================================
 
         const tg = window.Telegram?.WebApp;
@@ -257,18 +301,50 @@
             document.getElementById('user-panel').style.display = 'none';
         }
 
-        // Данные
         let products = JSON.parse(localStorage.getItem('hunter_products')) || [];
         let cart = JSON.parse(localStorage.getItem('hunter_cart')) || [];
         let favorites = JSON.parse(localStorage.getItem('hunter_favorites')) || [];
         let userProfile = JSON.parse(localStorage.getItem('hunter_profile')) || { name: '', phone: '', address: '' };
         
         let currentImagesBase64 = [];
-        let currentViewProductId = null;
+        let selectedPaymentMethod = 'cash'; 
 
-        // Форматирование цены (14.680 -> 14 680)
         function formatPrice(price) {
-            return Number(price).toLocaleString('ru-RU');
+            return String(Math.floor(price)).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+        }
+
+        // --- ВЫБОР ОПЛАТЫ ---
+        function selectPayment(type) {
+            selectedPaymentMethod = type;
+            document.getElementById('payOptCash').classList.remove('active');
+            document.getElementById('payOptCard').classList.remove('active');
+            document.getElementById('requisitesBox').classList.remove('active');
+
+            if (type === 'cash') {
+                document.getElementById('payOptCash').classList.add('active');
+            } else {
+                document.getElementById('payOptCard').classList.add('active');
+                document.getElementById('requisitesBox').classList.add('active');
+                
+                // Заполняем данные для перевода
+                document.getElementById('bankNameDisplay').innerText = BANK_NAME;
+                document.getElementById('holderNameDisplay').innerText = CARD_HOLDER;
+                document.getElementById('phoneNumberDisplay').innerText = PAYMENT_PHONE;
+            }
+            if (tg) tg.HapticFeedback.impactOccurred('light');
+        }
+
+        function copyPhone() {
+            // Очищаем номер от пробелов и дефисов для копирования (оставляем + и цифры)
+            const cleanPhone = PAYMENT_PHONE.replace(/[^\d+]/g, ''); 
+            navigator.clipboard.writeText(cleanPhone).then(() => {
+                if (tg) {
+                    tg.HapticFeedback.notificationOccurred('success');
+                    tg.showAlert('Номер телефона скопирован!');
+                } else {
+                    alert('Номер телефона скопирован!');
+                }
+            });
         }
 
         // --- НАВИГАЦИЯ ---
@@ -334,8 +410,8 @@
             let rawPrice = document.getElementById('addPrice').value;
             const desc = document.getElementById('addDesc').value.trim();
 
-            rawPrice = rawPrice.replace(/\s/g, '').replace(',', '.');
-            const cleanPrice = parseFloat(rawPrice);
+            const cleanDigits = rawPrice.replace(/[^\d]/g, ''); 
+            const cleanPrice = parseInt(cleanDigits, 10);
 
             if (!name || isNaN(cleanPrice) || cleanPrice <= 0 || currentImagesBase64.length === 0) {
                 if (tg) tg.showAlert('Заполните все поля корректно и добавьте фото!'); else alert('Заполните все поля!');
@@ -434,11 +510,10 @@
             });
         }
 
-        // --- ПРОСМОТР ТОВАРА (КАРТОЧКА) ---
+        // --- ПРОСМОТР ТОВАРА ---
         function openViewModal(id) {
             const product = products.find(p => p.id === id);
             if (!product) return;
-            currentViewProductId = id;
 
             document.getElementById('viewImage').src = product.images[0];
             document.getElementById('viewName').innerText = product.name;
@@ -546,14 +621,15 @@
             renderCatalog(document.getElementById('searchInput').value);
         }
 
-        // --- ОФОРМЛЕНИЕ ЗАКАЗА (ФОРМА) ---
+        // --- ОФОРМЛЕНИЕ ЗАКАЗА ---
         function openCheckoutModal() {
             if (cart.length === 0) return;
             
-            // Подставляем сохраненные данные
             document.getElementById('checkoutName').value = userProfile.name || '';
             document.getElementById('checkoutPhone').value = userProfile.phone || '';
             document.getElementById('checkoutAddress').value = userProfile.address || '';
+            
+            selectPayment('cash'); // По умолчанию наличные
             
             document.getElementById('checkoutModal').classList.add('active');
         }
@@ -572,7 +648,6 @@
                 return;
             }
 
-            // Сохраняем профиль
             userProfile = { name, phone, address };
             localStorage.setItem('hunter_profile', JSON.stringify(userProfile));
 
@@ -588,7 +663,14 @@
 
             message += `💰 *ИТОГО: ${formatPrice(total)} ₽*\n\n`;
             message += `👤 *Данные покупателя:*\nИмя: ${name}\nТелефон: ${phone}\nАдрес: ${address || 'Самовывоз / Уточнить'}\n\n`;
-            message += `Здравствуйте! Я оформил заказ в вашем магазине.`;
+            
+            if (selectedPaymentMethod === 'cash') {
+                message += `💵 *Оплата:* При получении\n`;
+            } else {
+                message += `💳 *Оплата:* Перевод по СБП (Т-Банк)\n`;
+            }
+
+            message += `\nЗдравствуйте! Я оформил заказ.`;
 
             const encodedMessage = encodeURIComponent(message);
             const url = `https://t.me/${SELLER_USERNAME}?text=${encodedMessage}`;
@@ -617,12 +699,9 @@
         }
 
         document.getElementById('editProfileBtn').addEventListener('click', () => {
-            // Перенаправляем на оформление, чтобы обновить данные (или просто открываем форму)
             if (cart.length > 0) {
                 openCheckoutModal();
             } else {
-                // Если корзина пуста, создаем фейковый товар для сохранения профиля? 
-                // Нет, просто дадим алерт.
                 if (tg) tg.showAlert('Чтобы обновить данные, добавьте товар в корзину и нажмите "Оформить".');
             }
         });
