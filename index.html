@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dark Marketplace</title>
+    <title>X.hunter77 Store</title>
     <script src="https://telegram.org"></script>
     <style>
         * {
@@ -16,7 +16,68 @@
             background-color: #0f0f12;
             color: #ffffff;
             padding: 12px;
-            padding-bottom: 80px;
+            padding-bottom: 90px;
+        }
+        .shop-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #18181d;
+            padding: 12px;
+            border-radius: 16px;
+            margin-bottom: 12px;
+            border: 1px solid #26262e;
+        }
+        .shop-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .shop-avatar {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #cb11ab, #8b11cb);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 900;
+            color: #ffffff;
+        }
+        .shop-title h1 {
+            font-size: 16px;
+            font-weight: 800;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .badge-ok {
+            background: #3390ec;
+            color: #fff;
+            font-size: 10px;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .shop-title p {
+            font-size: 11px;
+            color: #9999a8;
+            margin-top: 2px;
+        }
+        .add-item-btn {
+            background: #262630;
+            color: #ffffff;
+            border: 1px solid #cb11ab;
+            border-radius: 10px;
+            padding: 8px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
         }
         .search-bar {
             background-color: #1c1c22;
@@ -35,6 +96,12 @@
             width: 100%;
             outline: none;
         }
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #9999a8;
+            font-size: 14px;
+        }
         .grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -47,11 +114,12 @@
             display: flex;
             flex-direction: column;
             border: 1px solid #26262e;
+            position: relative;
         }
         .img-box {
             position: relative;
             width: 100%;
-            height: 150px;
+            height: 165px;
             background-color: #23232b;
         }
         .img-box img {
@@ -69,6 +137,19 @@
             font-weight: bold;
             padding: 2px 6px;
             border-radius: 6px;
+        }
+        .del-btn {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: rgba(15, 15, 18, 0.8);
+            color: #ff4d4f;
+            border: none;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            font-size: 13px;
+            cursor: pointer;
         }
         .info {
             padding: 10px;
@@ -103,14 +184,6 @@
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
-        .rating {
-            font-size: 12px;
-            color: #9999a8;
-            margin-bottom: 10px;
-        }
-        .rating span {
-            color: #ffb800;
-        }
         .btn {
             width: 100%;
             background: linear-gradient(90deg, #cb11ab, #8b11cb);
@@ -121,19 +194,128 @@
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
+            margin-top: 6px;
         }
         .btn.added {
             background: #28a745;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+        .modal.open {
+            display: flex;
+        }
+        .modal-box {
+            background: #18181d;
+            border: 1px solid #2c2c35;
+            border-radius: 16px;
+            padding: 16px;
+            width: 100%;
+            max-width: 380px;
+        }
+        .modal-box h2 {
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+        .field {
+            margin-bottom: 10px;
+        }
+        .field label {
+            display: block;
+            font-size: 12px;
+            color: #9999a8;
+            margin-bottom: 4px;
+        }
+        .field input {
+            width: 100%;
+            background: #0f0f12;
+            border: 1px solid #2c2c35;
+            border-radius: 10px;
+            padding: 10px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+        }
+        .modal-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 14px;
+        }
+        .cancel-btn {
+            flex: 1;
+            background: #262630;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 10px;
+            font-weight: 600;
+        }
+        .save-btn {
+            flex: 1;
+            background: linear-gradient(90deg, #cb11ab, #8b11cb);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 10px;
+            font-weight: 600;
         }
     </style>
 </head>
 <body>
 
+    <div class="shop-header">
+        <div class="shop-left">
+            <div class="shop-avatar">X</div>
+            <div class="shop-title">
+                <h1>X.hunter77 <span class="badge-ok">✓</span></h1>
+                <p>Официальный магазин</p>
+            </div>
+        </div>
+        <button class="add-item-btn" onclick="openModal()">+ Товар</button>
+    </div>
+
     <div class="search-bar">
-        <input type="text" id="searchInput" placeholder="Поиск товаров..." onkeyup="filterProducts()">
+        <input type="text" id="searchInput" placeholder="Поиск по каталогу..." onkeyup="filterProducts()">
+    </div>
+
+    <div id="emptyState" class="empty-state" style="display: none;">
+        Каталог пуст. Нажми «+ Товар» вверху, чтобы добавить фото и цену из галереи.
     </div>
 
     <div class="grid" id="catalog"></div>
+
+    <div class="modal" id="addModal">
+        <div class="modal-box">
+            <h2>Добавить товар</h2>
+            <div class="field">
+                <label>Фото из галереи</label>
+                <input type="file" id="itemPhoto" accept="image/*">
+            </div>
+            <div class="field">
+                <label>Название товара</label>
+                <input type="text" id="itemName" placeholder="Впиши название...">
+            </div>
+            <div class="field">
+                <label>Цена (₽)</label>
+                <input type="number" id="itemPrice" placeholder="2500">
+            </div>
+            <div class="field">
+                <label>Старая цена (₽)</label>
+                <input type="number" id="itemOldPrice" placeholder="4000">
+            </div>
+            <div class="modal-actions">
+                <button class="cancel-btn" onclick="closeModal()">Отмена</button>
+                <button class="save-btn" onclick="saveNewProduct()">Добавить</button>
+            </div>
+        </div>
+    </div>
 
     <script>
         const tg = window.Telegram.WebApp;
@@ -141,117 +323,23 @@
         tg.setHeaderColor('#0f0f12');
         tg.setBackgroundColor('#0f0f12');
 
-        // ==========================================
-        // ЗДЕСЬ ТЫ МОЖЕШЬ МЕНЯТЬ ТОВАРЫ, ЦЕНЫ И ФОТО
-        // ==========================================
-        const products = [
-            {
-                id: 1,
-                name: "Беспроводные наушники Pro",
-                price: 2490,
-                oldPrice: 4990,
-                discount: "-50%",
-                rating: "4.9 (128)",
-                image: "https://unsplash.com"
-            },
-            {
-                id: 2,
-                name: "Смарт-часы Ultra Black",
-                price: 3890,
-                oldPrice: 6500,
-                discount: "-40%",
-                rating: "4.8 (84)",
-                image: "https://unsplash.com"
-            },
-            {
-                id: 3,
-                name: "Кроссовки спортивные Dark",
-                price: 4200,
-                oldPrice: 7000,
-                discount: "-40%",
-                rating: "5.0 (42)",
-                image: "https://unsplash.com"
-            },
-            {
-                id: 4,
-                name: "Рюкзак городской водостойкий",
-                price: 1990,
-                oldPrice: 3200,
-                discount: "-38%",
-                rating: "4.7 (210)",
-                image: "https://unsplash.com"
-            }
-        ];
-
+        let products = JSON.parse(localStorage.getItem('xhunter_clean_products')) || [];
         let cart = [];
 
         function renderProducts(items) {
             const catalog = document.getElementById('catalog');
+            const emptyState = document.getElementById('emptyState');
             catalog.innerHTML = '';
+
+            if (items.length === 0) {
+                emptyState.style.display = 'block';
+                return;
+            } else {
+                emptyState.style.display = 'none';
+            }
 
             items.forEach(item => {
                 const isAdded = cart.some(c => c.id === item.id);
                 catalog.innerHTML += `
                     <div class="card">
                         <div class="img-box">
-                            <img src="${item.image}" alt="${item.name}">
-                            <div class="discount">${item.discount}</div>
-                        </div>
-                        <div class="info">
-                            <div>
-                                <div class="prices">
-                                    <span class="new-price">${item.price} ₽</span>
-                                    <span class="old-price">${item.oldPrice} ₽</span>
-                                </div>
-                                <div class="title">${item.name}</div>
-                                <div class="rating"><span>★</span> ${item.rating}</div>
-                            </div>
-                            <button class="btn ${isAdded ? 'added' : ''}" onclick="toggleCart(${item.id})">
-                                ${isAdded ? 'В корзине ✓' : 'В корзину'}
-                            </button>
-                        </div>
-                    </div>
-                `;
-            });
-        }
-
-        function toggleCart(id) {
-            const product = products.find(p => p.id === id);
-            const index = cart.findIndex(c => c.id === id);
-
-            if (index > -1) {
-                cart.splice(index, 1);
-            } else {
-                cart.push(product);
-            }
-
-            renderProducts(products);
-            updateMainButton();
-        }
-
-        function updateMainButton() {
-            if (cart.length > 0) {
-                const total = cart.reduce((sum, item) => sum + item.price, 0);
-                tg.MainButton.setText(`Оформить заказ (${cart.length} шт.) — ${total} ₽`);
-                tg.MainButton.show();
-            } else {
-                tg.MainButton.hide();
-            }
-        }
-
-        function filterProducts() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = products.filter(p => p.name.toLowerCase().includes(query));
-            renderProducts(filtered);
-        }
-
-        tg.MainButton.onClick(() => {
-            if (cart.length > 0) {
-                tg.sendData(JSON.stringify(cart));
-            }
-        });
-
-        renderProducts(products);
-    </script>
-</body>
-</html>
