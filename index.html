@@ -3,228 +3,431 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>X.hunter77 Store</title>
-    <script src="https://telegram.org"></script>
+    <title>X.hunter77 - Магазин</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: #0f0f12;
-            color: #ffffff;
-            padding: 12px;
-            padding-bottom: 90px;
+        :root {
+            --bg-color: #0b0b0d;
+            --card-bg: #1c1c1e;
+            --text-main: #ffffff;
+            --text-muted: #8e8e93;
+            --accent: #b32cb6; /* Цвет кнопки + Товар */
+            --accent-hover: #912293;
         }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding: 16px;
+            padding-top: 20px;
+            min-height: 100vh;
+        }
+
+        /* Шапка магазина */
         .shop-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background-color: #18181d;
-            padding: 12px;
+            background-color: var(--card-bg);
+            padding: 12px 16px;
             border-radius: 16px;
-            margin-bottom: 12px;
-            border: 1px solid #26262e;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
-        .shop-left { display: flex; align-items: center; gap: 10px; }
-        .shop-avatar {
-            width: 44px; height: 44px; border-radius: 50%;
-            background: linear-gradient(135deg, #cb11ab, #8b11cb);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 18px; font-weight: 900; color: #fff;
+
+        .shop-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
-        .shop-title h1 { font-size: 16px; font-weight: 800; display: flex; align-items: center; gap: 5px; }
-        .badge-ok {
-            background: #3390ec; color: #fff; font-size: 10px;
-            width: 15px; height: 15px; border-radius: 50%;
-            display: inline-flex; align-items: center; justify-content: center;
+
+        .avatar {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #a12bb5, #6b21a8);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 20px;
         }
-        .shop-title p { font-size: 11px; color: #9999a8; margin-top: 2px; }
-        .add-item-btn {
-            background: linear-gradient(90deg, #cb11ab, #8b11cb);
-            color: #ffffff; border: none; border-radius: 10px;
-            padding: 10px 14px; font-size: 13px; font-weight: 700;
-            cursor: pointer; touch-action: manipulation;
+
+        .shop-name {
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
-        .search-bar {
-            background-color: #1c1c22; border-radius: 12px; padding: 10px 14px;
-            margin-bottom: 14px; border: 1px solid #2c2c35;
+
+        .verified {
+            color: #3b82f6;
+            font-size: 14px;
         }
-        .search-bar input {
-            background: transparent; border: none; color: #fff;
-            font-size: 15px; width: 100%; outline: none;
+
+        .shop-desc {
+            font-size: 12px;
+            color: var(--text-muted);
         }
+
+        /* Кнопка + Товар */
+        .btn-add {
+            background: transparent;
+            color: var(--text-main);
+            border: 1.5px solid var(--accent);
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .btn-add:active {
+            background-color: var(--accent);
+            transform: scale(0.95);
+        }
+
+        /* Поиск */
+        .search-box {
+            width: 100%;
+            background-color: var(--card-bg);
+            border: 1px solid #2c2c2e;
+            color: white;
+            padding: 14px 16px;
+            border-radius: 14px;
+            font-size: 15px;
+            margin-bottom: 20px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        
+        .search-box:focus {
+            border-color: var(--accent);
+        }
+
+        /* Сетка товаров */
+        .catalog {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 12px;
+        }
+
+        .product-card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            background-color: #2c2c2e;
+        }
+
+        .product-info {
+            padding: 12px;
+        }
+
+        .product-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .product-price {
+            font-size: 14px;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
         .empty-state {
-            text-align: center; padding: 50px 20px; color: #9999a8; font-size: 14px; line-height: 1.5;
+            grid-column: 1 / -1;
+            text-align: center;
+            color: var(--text-muted);
+            padding: 40px 0;
+            font-size: 14px;
         }
-        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-        .card {
-            background-color: #18181d; border-radius: 14px; overflow: hidden;
-            display: flex; flex-direction: column; border: 1px solid #26262e; position: relative;
+
+        /* Модальное окно */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(5px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
         }
-        .img-box { position: relative; width: 100%; height: 160px; background-color: #23232b; }
-        .img-box img { width: 100%; height: 100%; object-fit: cover; }
-        .discount {
-            position: absolute; bottom: 8px; left: 8px; background-color: #cb11ab;
-            color: #fff; font-size: 11px; font-weight: bold; padding: 2px 6px; border-radius: 6px;
+
+        .modal-overlay.active {
+            display: flex;
+            animation: fadeIn 0.2s ease;
         }
-        .del-btn {
-            position: absolute; top: 6px; right: 6px; background: rgba(15, 15, 18, 0.85);
-            color: #ff4d4f; border: none; width: 28px; height: 28px; border-radius: 50%;
-            font-size: 14px; cursor: pointer;
-        }
-        .info { padding: 10px; display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between; }
-        .prices { display: flex; align-items: baseline; gap: 6px; margin-bottom: 4px; }
-        .new-price { font-size: 16px; font-weight: 800; color: #fff; }
-        .old-price { font-size: 12px; color: #777785; text-decoration: line-through; }
-        .title {
-            font-size: 13px; color: #d1d1db; margin-bottom: 6px; line-height: 1.3;
-            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
-        }
-        .btn {
-            width: 100%; background: linear-gradient(90deg, #cb11ab, #8b11cb);
-            color: #fff; border: none; border-radius: 10px; padding: 9px;
-            font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 6px;
-        }
-        .btn.added { background: #28a745; }
+
         .modal {
-            display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.9);
-            z-index: 999; align-items: center; justify-content: center; padding: 16px;
+            background-color: var(--card-bg);
+            width: 100%;
+            max-width: 400px;
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transform: translateY(20px);
+            animation: slideUp 0.3s ease forwards;
         }
-        .modal.open { display: flex; }
-        .modal-box {
-            background: #18181d; border: 1px solid #2c2c35; border-radius: 16px;
-            padding: 16px; width: 100%; max-width: 380px;
+
+        .modal h2 {
+            font-size: 18px;
+            margin-bottom: 16px;
+            text-align: center;
         }
-        .modal-box h2 { font-size: 18px; margin-bottom: 12px; }
-        .field { margin-bottom: 10px; }
-        .field label { display: block; font-size: 12px; color: #9999a8; margin-bottom: 4px; }
-        .field input {
-            width: 100%; background: #0f0f12; border: 1px solid #2c2c35;
-            border-radius: 10px; padding: 10px; color: #fff; font-size: 15px; outline: none;
+
+        .input-group {
+            margin-bottom: 12px;
         }
-        .modal-actions { display: flex; gap: 8px; margin-top: 14px; }
-        .cancel-btn {
-            flex: 1; background: #262630; color: #fff; border: none;
-            border-radius: 10px; padding: 12px; font-weight: 600; font-size: 14px;
+
+        .input-group label {
+            display: block;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
         }
-        .save-btn {
-            flex: 1; background: linear-gradient(90deg, #cb11ab, #8b11cb);
-            color: #fff; border: none; border-radius: 10px; padding: 12px; font-weight: 700; font-size: 14px;
+
+        .input-group input {
+            width: 100%;
+            background-color: var(--bg-color);
+            border: 1px solid #2c2c2e;
+            color: white;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .input-group input:focus {
+            border-color: var(--accent);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-save {
+            flex: 1;
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .btn-cancel {
+            flex: 1;
+            background-color: transparent;
+            color: var(--text-muted);
+            border: 1px solid #2c2c2e;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            to { transform: translateY(0); }
         }
     </style>
 </head>
 <body>
 
+    <!-- Шапка -->
     <div class="shop-header">
-        <div class="shop-left">
-            <div class="shop-avatar">X</div>
-            <div class="shop-title">
-                <h1>X.hunter77 <span class="badge-ok">✓</span></h1>
-                <p>Официальный магазин v3</p>
+        <div class="shop-info">
+            <div class="avatar">X</div>
+            <div>
+                <div class="shop-name">X.hunter77 <span class="verified">✔</span></div>
+                <div class="shop-desc">Официальный магазин</div>
             </div>
         </div>
-        <button type="button" class="add-item-btn" onclick="openAddModal()">+ Товар</button>
+        <button class="btn-add" id="openModalBtn">+ Товар</button>
     </div>
 
-    <div class="search-bar">
-        <input type="text" id="searchInput" placeholder="Поиск по каталогу..." oninput="renderCatalog()">
+    <!-- Поиск -->
+    <input type="text" class="search-box" id="searchInput" placeholder="Поиск по каталогу...">
+
+    <!-- Каталог -->
+    <div class="catalog" id="catalog">
+        <div class="empty-state" id="emptyState">Товаров пока нет. Нажмите "+ Товар", чтобы добавить.</div>
     </div>
 
-    <div id="emptyState" class="empty-state">
-        Каталог пуст.<br>Нажми розовую кнопку <b>«+ Товар»</b> сверху справа.
-    </div>
-
-    <div class="grid" id="catalog"></div>
-
-    <div class="modal" id="addModal">
-        <div class="modal-box">
-            <h2>Новый товар</h2>
-            <div class="field">
-                <label>Фото из галереи</label>
-                <input type="file" id="itemPhoto" accept="image/*">
-            </div>
-            <div class="field">
+    <!-- Модальное окно добавления товара -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <h2>Добавить товар</h2>
+            <div class="input-group">
                 <label>Название товара</label>
-                <input type="text" id="itemName" placeholder="Например: Худи Black">
+                <input type="text" id="productName" placeholder="Например: Кроссовки Nike">
             </div>
-            <div class="field">
+            <div class="input-group">
                 <label>Цена (₽)</label>
-                <input type="number" id="itemPrice" placeholder="2500">
+                <input type="number" id="productPrice" placeholder="Например: 4500">
             </div>
-            <div class="field">
-                <label>Старая цена (₽)</label>
-                <input type="number" id="itemOldPrice" placeholder="4000">
+            <div class="input-group">
+                <label>Ссылка на картинку (URL)</label>
+                <input type="url" id="productImage" placeholder="https://...">
             </div>
             <div class="modal-actions">
-                <button type="button" class="cancel-btn" onclick="closeAddModal()">Отмена</button>
-                <button type="button" class="save-btn" onclick="handleAddProduct()">Добавить</button>
+                <button class="btn-cancel" id="closeModalBtn">Отмена</button>
+                <button class="btn-save" id="saveProductBtn">Сохранить</button>
             </div>
         </div>
     </div>
 
     <script>
-        if (window.Telegram && window.Telegram.WebApp) {
-            window.Telegram.WebApp.expand();
-            window.Telegram.WebApp.setHeaderColor('#0f0f12');
-            window.Telegram.WebApp.setBackgroundColor('#0f0f12');
+        // Инициализация Telegram Web App
+        const tg = window.Telegram?.WebApp;
+        if (tg) {
+            tg.ready();
+            tg.expand(); // Развернуть на весь экран
+            // Устанавливаем цвет шапки Telegram в цвет фона
+            tg.setHeaderColor('#0b0b0d');
         }
 
-        let products = [];
-        try {
-            products = JSON.parse(localStorage.getItem('xhunter_v3')) || [];
-        } catch (e) {
-            products = [];
-        }
-        let cart = [];
+        // Элементы DOM
+        const openModalBtn = document.getElementById('openModalBtn');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const saveProductBtn = document.getElementById('saveProductBtn');
+        const catalog = document.getElementById('catalog');
+        const emptyState = document.getElementById('emptyState');
+        const searchInput = document.getElementById('searchInput');
 
-        function openAddModal() {
-            document.getElementById('addModal').classList.add('open');
-        }
+        // База данных в памяти (изначально берем из localStorage)
+        let products = JSON.parse(localStorage.getItem('shop_products')) || [];
 
-        function closeAddModal() {
-            document.getElementById('addModal').classList.remove('open');
-        }
+        // Функция для отображения товаров
+        function renderProducts(filterText = '') {
+            catalog.innerHTML = '';
+            
+            // Фильтрация по поиску
+            const filteredProducts = products.filter(p => 
+                p.name.toLowerCase().includes(filterText.toLowerCase())
+            );
 
-        function handleAddProduct() {
-            const name = document.getElementById('itemName').value.trim();
-            const price = Number(document.getElementById('itemPrice').value);
-            const oldPrice = Number(document.getElementById('itemOldPrice').value) || Math.round(price * 1.3);
-            const fileInput = document.getElementById('itemPhoto');
-
-            if (!name || !price) {
-                alert('Впиши название и цену!');
+            if (filteredProducts.length === 0) {
+                catalog.innerHTML = `<div class="empty-state">${filterText ? 'Ничего не найдено' : 'Товаров пока нет. Нажмите "+ Товар", чтобы добавить.'}</div>`;
                 return;
             }
 
-            const disc = Math.round(((oldPrice - price) / oldPrice) * 100);
-            const discountText = disc > 0 ? '-' + disc + '%' : 'ХИТ';
-            const fallbackImg = 'https://placeholder.com';
-
-            if (fileInput.files && fileInput.files.length > 0) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    finishAdd(name, price, oldPrice, discountText, e.target.result);
-                };
-                reader.onerror = function() {
-                    finishAdd(name, price, oldPrice, discountText, fallbackImg);
-                };
-                reader.readAsDataURL(fileInput.files);
-            } else {
-                finishAdd(name, price, oldPrice, discountText, fallbackImg);
-            }
+            filteredProducts.forEach((product, index) => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.innerHTML = `
+                    <img src="${product.image || 'https://via.placeholder.com/150/1c1c1e/ffffff?text=No+Image'}" class="product-image" alt="${product.name}" onerror="this.src='https://via.placeholder.com/150/1c1c1e/ffffff?text=No+Image'">
+                    <div class="product-info">
+                        <div class="product-title">${product.name}</div>
+                        <div class="product-price">${product.price} ₽</div>
+                    </div>
+                `;
+                catalog.appendChild(card);
+            });
         }
 
-        function finishAdd(name, price, oldPrice, discount, image) {
-            products.unshift({
-                id: Date.now(),
-                name: name,
-                price: price,
-                oldPrice: oldPrice,
-                discount: discount,
-                image: image
-            });
-            try {
-                localStorage.setItem('xhunter_v3', JSON.stringify(products));
-            } catch (e) {}
+        // Открытие модального окна
+        openModalBtn.addEventListener('click', () => {
+            if (tg) tg.HapticFeedback.impactOccurred('light'); // Вибрация в Telegram
+            modalOverlay.classList.add('active');
+            document.getElementById('productName').focus();
+        });
+
+        // Закрытие модального окна
+        closeModalBtn.addEventListener('click', () => {
+            modalOverlay.classList.remove('active');
+            clearInputs();
+        });
+
+        // Закрытие по клику вне окна
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) {
+                modalOverlay.classList.remove('active');
+                clearInputs();
+            }
+        });
+
+        // Сохранение товара
+        saveProductBtn.addEventListener('click', () => {
+            const name = document.getElementById('productName').value.trim();
+            const price = document.getElementById('productPrice').value.trim();
+            const image = document.getElementById('productImage').value.trim();
+
+            if (!name || !price) {
+                if (tg) tg.showAlert('Заполните название и цену!');
+                else alert('Заполните название и цену!');
+                return;
+            }
+
+            const newProduct = { name, price, image };
+            products.push(newProduct);
             
-            document.getElementById('itemName').value = '';
-            document.getElementById('itemPrice').value = '';
+            // Сохраняем в localStorage
+            localStorage.setItem('shop_products', JSON.stringify(products));
+
+            // Очищаем инпуты, закрываем окно, обновляем каталог
+            clearInputs();
+            modalOverlay.classList.remove('active');
+            renderProducts(searchInput.value);
+
+            if (tg) {
+                tg.HapticFeedback.notificationOccurred('success');
+                tg.showPopup({ message: 'Товар успешно добавлен!' });
+            }
+        });
+
+        // Очистка полей ввода
+        function clearInputs() {
+            document.getElementById('productName').value = '';
+            document.getElementById('productPrice').value = '';
+            document.getElementById('productImage').value = '';
+        }
+
+        // Живой поиск
+        searchInput.addEventListener('input', (e) => {
+            renderProducts(e.target.value);
+        });
+
+        // Первичный рендер при загрузке
+        renderProducts();
+
+    </script>
+</body>
+</html>
