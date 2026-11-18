@@ -2,15 +2,11 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>X.hunter77 Store</title>
     <script src="https://telegram.org"></script>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             background-color: #0f0f12;
@@ -28,244 +24,91 @@
             margin-bottom: 12px;
             border: 1px solid #26262e;
         }
-        .shop-left {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        .shop-left { display: flex; align-items: center; gap: 10px; }
         .shop-avatar {
-            width: 46px;
-            height: 46px;
-            border-radius: 50%;
+            width: 44px; height: 44px; border-radius: 50%;
             background: linear-gradient(135deg, #cb11ab, #8b11cb);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            font-weight: 900;
-            color: #ffffff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; font-weight: 900; color: #fff;
         }
-        .shop-title h1 {
-            font-size: 16px;
-            font-weight: 800;
-            color: #ffffff;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
+        .shop-title h1 { font-size: 16px; font-weight: 800; display: flex; align-items: center; gap: 5px; }
         .badge-ok {
-            background: #3390ec;
-            color: #fff;
-            font-size: 10px;
-            width: 15px;
-            height: 15px;
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
+            background: #3390ec; color: #fff; font-size: 10px;
+            width: 15px; height: 15px; border-radius: 50%;
+            display: inline-flex; align-items: center; justify-content: center;
         }
-        .shop-title p {
-            font-size: 11px;
-            color: #9999a8;
-            margin-top: 2px;
-        }
+        .shop-title p { font-size: 11px; color: #9999a8; margin-top: 2px; }
         .add-item-btn {
             background: linear-gradient(90deg, #cb11ab, #8b11cb);
-            color: #ffffff;
-            border: none;
-            border-radius: 10px;
-            padding: 9px 14px;
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
+            color: #ffffff; border: none; border-radius: 10px;
+            padding: 10px 14px; font-size: 13px; font-weight: 700;
+            cursor: pointer; touch-action: manipulation;
         }
         .search-bar {
-            background-color: #1c1c22;
-            border-radius: 12px;
-            padding: 10px 14px;
-            margin-bottom: 14px;
-            display: flex;
-            align-items: center;
-            border: 1px solid #2c2c35;
+            background-color: #1c1c22; border-radius: 12px; padding: 10px 14px;
+            margin-bottom: 14px; border: 1px solid #2c2c35;
         }
         .search-bar input {
-            background: transparent;
-            border: none;
-            color: #ffffff;
-            font-size: 15px;
-            width: 100%;
-            outline: none;
+            background: transparent; border: none; color: #fff;
+            font-size: 15px; width: 100%; outline: none;
         }
         .empty-state {
-            text-align: center;
-            padding: 50px 20px;
-            color: #9999a8;
-            font-size: 14px;
-            line-height: 1.5;
+            text-align: center; padding: 50px 20px; color: #9999a8; font-size: 14px; line-height: 1.5;
         }
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-        }
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
         .card {
-            background-color: #18181d;
-            border-radius: 14px;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            border: 1px solid #26262e;
-            position: relative;
+            background-color: #18181d; border-radius: 14px; overflow: hidden;
+            display: flex; flex-direction: column; border: 1px solid #26262e; position: relative;
         }
-        .img-box {
-            position: relative;
-            width: 100%;
-            height: 165px;
-            background-color: #23232b;
-        }
-        .img-box img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+        .img-box { position: relative; width: 100%; height: 160px; background-color: #23232b; }
+        .img-box img { width: 100%; height: 100%; object-fit: cover; }
         .discount {
-            position: absolute;
-            bottom: 8px;
-            left: 8px;
-            background-color: #cb11ab;
-            color: #ffffff;
-            font-size: 11px;
-            font-weight: bold;
-            padding: 2px 6px;
-            border-radius: 6px;
+            position: absolute; bottom: 8px; left: 8px; background-color: #cb11ab;
+            color: #fff; font-size: 11px; font-weight: bold; padding: 2px 6px; border-radius: 6px;
         }
         .del-btn {
-            position: absolute;
-            top: 6px;
-            right: 6px;
-            background: rgba(15, 15, 18, 0.85);
-            color: #ff4d4f;
-            border: none;
-            width: 26px;
-            height: 26px;
-            border-radius: 50%;
-            font-size: 13px;
-            cursor: pointer;
+            position: absolute; top: 6px; right: 6px; background: rgba(15, 15, 18, 0.85);
+            color: #ff4d4f; border: none; width: 28px; height: 28px; border-radius: 50%;
+            font-size: 14px; cursor: pointer;
         }
-        .info {
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-            justify-content: space-between;
-        }
-        .prices {
-            display: flex;
-            align-items: baseline;
-            gap: 6px;
-            margin-bottom: 4px;
-        }
-        .new-price {
-            font-size: 16px;
-            font-weight: 800;
-            color: #ffffff;
-        }
-        .old-price {
-            font-size: 12px;
-            color: #777785;
-            text-decoration: line-through;
-        }
+        .info { padding: 10px; display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between; }
+        .prices { display: flex; align-items: baseline; gap: 6px; margin-bottom: 4px; }
+        .new-price { font-size: 16px; font-weight: 800; color: #fff; }
+        .old-price { font-size: 12px; color: #777785; text-decoration: line-through; }
         .title {
-            font-size: 13px;
-            color: #d1d1db;
-            margin-bottom: 6px;
-            line-height: 1.3;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
+            font-size: 13px; color: #d1d1db; margin-bottom: 6px; line-height: 1.3;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
         }
         .btn {
-            width: 100%;
-            background: linear-gradient(90deg, #cb11ab, #8b11cb);
-            color: #ffffff;
-            border: none;
-            border-radius: 10px;
-            padding: 9px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 6px;
+            width: 100%; background: linear-gradient(90deg, #cb11ab, #8b11cb);
+            color: #fff; border: none; border-radius: 10px; padding: 9px;
+            font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 6px;
         }
-        .btn.added {
-            background: #28a745;
-        }
+        .btn.added { background: #28a745; }
         .modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.88);
-            z-index: 100;
-            align-items: center;
-            justify-content: center;
-            padding: 16px;
+            display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.9);
+            z-index: 999; align-items: center; justify-content: center; padding: 16px;
         }
-        .modal.open {
-            display: flex;
-        }
+        .modal.open { display: flex; }
         .modal-box {
-            background: #18181d;
-            border: 1px solid #2c2c35;
-            border-radius: 16px;
-            padding: 16px;
-            width: 100%;
-            max-width: 380px;
+            background: #18181d; border: 1px solid #2c2c35; border-radius: 16px;
+            padding: 16px; width: 100%; max-width: 380px;
         }
-        .modal-box h2 {
-            font-size: 18px;
-            margin-bottom: 12px;
-        }
-        .field {
-            margin-bottom: 10px;
-        }
-        .field label {
-            display: block;
-            font-size: 12px;
-            color: #9999a8;
-            margin-bottom: 4px;
-        }
+        .modal-box h2 { font-size: 18px; margin-bottom: 12px; }
+        .field { margin-bottom: 10px; }
+        .field label { display: block; font-size: 12px; color: #9999a8; margin-bottom: 4px; }
         .field input {
-            width: 100%;
-            background: #0f0f12;
-            border: 1px solid #2c2c35;
-            border-radius: 10px;
-            padding: 10px;
-            color: #fff;
-            font-size: 14px;
-            outline: none;
+            width: 100%; background: #0f0f12; border: 1px solid #2c2c35;
+            border-radius: 10px; padding: 10px; color: #fff; font-size: 15px; outline: none;
         }
-        .modal-actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 14px;
-        }
+        .modal-actions { display: flex; gap: 8px; margin-top: 14px; }
         .cancel-btn {
-            flex: 1;
-            background: #262630;
-            color: #fff;
-            border: none;
-            border-radius: 10px;
-            padding: 10px;
-            font-weight: 600;
+            flex: 1; background: #262630; color: #fff; border: none;
+            border-radius: 10px; padding: 12px; font-weight: 600; font-size: 14px;
         }
         .save-btn {
-            flex: 1;
-            background: linear-gradient(90deg, #cb11ab, #8b11cb);
-            color: #fff;
-            border: none;
-            border-radius: 10px;
-            padding: 10px;
-            font-weight: 600;
+            flex: 1; background: linear-gradient(90deg, #cb11ab, #8b11cb);
+            color: #fff; border: none; border-radius: 10px; padding: 12px; font-weight: 700; font-size: 14px;
         }
     </style>
 </head>
@@ -276,71 +119,112 @@
             <div class="shop-avatar">X</div>
             <div class="shop-title">
                 <h1>X.hunter77 <span class="badge-ok">✓</span></h1>
-                <p>Официальный магазин</p>
+                <p>Официальный магазин v3</p>
             </div>
         </div>
-        <button type="button" class="add-item-btn" id="openAddBtn">+ Товар</button>
+        <button type="button" class="add-item-btn" onclick="openAddModal()">+ Товар</button>
     </div>
 
     <div class="search-bar">
-        <input type="text" id="searchInput" placeholder="Поиск по каталогу...">
+        <input type="text" id="searchInput" placeholder="Поиск по каталогу..." oninput="renderCatalog()">
     </div>
 
     <div id="emptyState" class="empty-state">
-        Каталог пока пуст.<br>Нажми кнопку <b>«+ Товар»</b> вверху, чтобы добавить фото и цену из галереи.
+        Каталог пуст.<br>Нажми розовую кнопку <b>«+ Товар»</b> сверху справа.
     </div>
 
     <div class="grid" id="catalog"></div>
 
     <div class="modal" id="addModal">
         <div class="modal-box">
-            <h2>Добавить товар</h2>
+            <h2>Новый товар</h2>
             <div class="field">
                 <label>Фото из галереи</label>
                 <input type="file" id="itemPhoto" accept="image/*">
             </div>
             <div class="field">
                 <label>Название товара</label>
-                <input type="text" id="itemName" placeholder="Впиши название...">
+                <input type="text" id="itemName" placeholder="Например: Худи Black">
             </div>
             <div class="field">
                 <label>Цена (₽)</label>
                 <input type="number" id="itemPrice" placeholder="2500">
             </div>
             <div class="field">
-                <label>Старая цена без скидки (₽)</label>
+                <label>Старая цена (₽)</label>
                 <input type="number" id="itemOldPrice" placeholder="4000">
             </div>
             <div class="modal-actions">
-                <button type="button" class="cancel-btn" id="cancelAddBtn">Отмена</button>
-                <button type="button" class="save-btn" id="saveAddBtn">Добавить</button>
+                <button type="button" class="cancel-btn" onclick="closeAddModal()">Отмена</button>
+                <button type="button" class="save-btn" onclick="handleAddProduct()">Добавить</button>
             </div>
         </div>
     </div>
 
     <script>
         if (window.Telegram && window.Telegram.WebApp) {
-            const tg = window.Telegram.WebApp;
-            tg.expand();
-            tg.setHeaderColor('#0f0f12');
-            tg.setBackgroundColor('#0f0f12');
+            window.Telegram.WebApp.expand();
+            window.Telegram.WebApp.setHeaderColor('#0f0f12');
+            window.Telegram.WebApp.setBackgroundColor('#0f0f12');
         }
 
         let products = [];
         try {
-            products = JSON.parse(localStorage.getItem('xhunter_v2_products')) || [];
+            products = JSON.parse(localStorage.getItem('xhunter_v3')) || [];
         } catch (e) {
             products = [];
         }
         let cart = [];
 
-        function renderProducts(items) {
-            const catalog = document.getElementById('catalog');
-            const emptyState = document.getElementById('emptyState');
-            catalog.innerHTML = '';
+        function openAddModal() {
+            document.getElementById('addModal').classList.add('open');
+        }
 
-            if (items.length === 0) {
-                emptyState.style.display = 'block';
+        function closeAddModal() {
+            document.getElementById('addModal').classList.remove('open');
+        }
+
+        function handleAddProduct() {
+            const name = document.getElementById('itemName').value.trim();
+            const price = Number(document.getElementById('itemPrice').value);
+            const oldPrice = Number(document.getElementById('itemOldPrice').value) || Math.round(price * 1.3);
+            const fileInput = document.getElementById('itemPhoto');
+
+            if (!name || !price) {
+                alert('Впиши название и цену!');
                 return;
+            }
+
+            const disc = Math.round(((oldPrice - price) / oldPrice) * 100);
+            const discountText = disc > 0 ? '-' + disc + '%' : 'ХИТ';
+            const fallbackImg = 'https://placeholder.com';
+
+            if (fileInput.files && fileInput.files.length > 0) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    finishAdd(name, price, oldPrice, discountText, e.target.result);
+                };
+                reader.onerror = function() {
+                    finishAdd(name, price, oldPrice, discountText, fallbackImg);
+                };
+                reader.readAsDataURL(fileInput.files);
             } else {
-                emptyState.style.display = 'none';
+                finishAdd(name, price, oldPrice, discountText, fallbackImg);
+            }
+        }
+
+        function finishAdd(name, price, oldPrice, discount, image) {
+            products.unshift({
+                id: Date.now(),
+                name: name,
+                price: price,
+                oldPrice: oldPrice,
+                discount: discount,
+                image: image
+            });
+            try {
+                localStorage.setItem('xhunter_v3', JSON.stringify(products));
+            } catch (e) {}
+            
+            document.getElementById('itemName').value = '';
+            document.getElementById('itemPrice').value = '';
