@@ -70,13 +70,13 @@
             margin-top: 2px;
         }
         .add-item-btn {
-            background: #262630;
+            background: linear-gradient(90deg, #cb11ab, #8b11cb);
             color: #ffffff;
-            border: 1px solid #cb11ab;
+            border: none;
             border-radius: 10px;
-            padding: 8px 12px;
-            font-size: 12px;
-            font-weight: 600;
+            padding: 9px 14px;
+            font-size: 13px;
+            font-weight: 700;
             cursor: pointer;
         }
         .search-bar {
@@ -98,9 +98,10 @@
         }
         .empty-state {
             text-align: center;
-            padding: 40px 20px;
+            padding: 50px 20px;
             color: #9999a8;
             font-size: 14px;
+            line-height: 1.5;
         }
         .grid {
             display: grid;
@@ -142,7 +143,7 @@
             position: absolute;
             top: 6px;
             right: 6px;
-            background: rgba(15, 15, 18, 0.8);
+            background: rgba(15, 15, 18, 0.85);
             color: #ff4d4f;
             border: none;
             width: 26px;
@@ -203,7 +204,7 @@
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(0, 0, 0, 0.88);
             z-index: 100;
             align-items: center;
             justify-content: center;
@@ -278,15 +279,15 @@
                 <p>Официальный магазин</p>
             </div>
         </div>
-        <button class="add-item-btn" onclick="openModal()">+ Товар</button>
+        <button type="button" class="add-item-btn" id="openAddBtn">+ Товар</button>
     </div>
 
     <div class="search-bar">
-        <input type="text" id="searchInput" placeholder="Поиск по каталогу..." onkeyup="filterProducts()">
+        <input type="text" id="searchInput" placeholder="Поиск по каталогу...">
     </div>
 
-    <div id="emptyState" class="empty-state" style="display: none;">
-        Каталог пуст. Нажми «+ Товар» вверху, чтобы добавить фото и цену из галереи.
+    <div id="emptyState" class="empty-state">
+        Каталог пока пуст.<br>Нажми кнопку <b>«+ Товар»</b> вверху, чтобы добавить фото и цену из галереи.
     </div>
 
     <div class="grid" id="catalog"></div>
@@ -307,23 +308,30 @@
                 <input type="number" id="itemPrice" placeholder="2500">
             </div>
             <div class="field">
-                <label>Старая цена (₽)</label>
+                <label>Старая цена без скидки (₽)</label>
                 <input type="number" id="itemOldPrice" placeholder="4000">
             </div>
             <div class="modal-actions">
-                <button class="cancel-btn" onclick="closeModal()">Отмена</button>
-                <button class="save-btn" onclick="saveNewProduct()">Добавить</button>
+                <button type="button" class="cancel-btn" id="cancelAddBtn">Отмена</button>
+                <button type="button" class="save-btn" id="saveAddBtn">Добавить</button>
             </div>
         </div>
     </div>
 
     <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-        tg.setHeaderColor('#0f0f12');
-        tg.setBackgroundColor('#0f0f12');
+        if (window.Telegram && window.Telegram.WebApp) {
+            const tg = window.Telegram.WebApp;
+            tg.expand();
+            tg.setHeaderColor('#0f0f12');
+            tg.setBackgroundColor('#0f0f12');
+        }
 
-        let products = JSON.parse(localStorage.getItem('xhunter_clean_products')) || [];
+        let products = [];
+        try {
+            products = JSON.parse(localStorage.getItem('xhunter_v2_products')) || [];
+        } catch (e) {
+            products = [];
+        }
         let cart = [];
 
         function renderProducts(items) {
@@ -336,10 +344,3 @@
                 return;
             } else {
                 emptyState.style.display = 'none';
-            }
-
-            items.forEach(item => {
-                const isAdded = cart.some(c => c.id === item.id);
-                catalog.innerHTML += `
-                    <div class="card">
-                        <div class="img-box">
